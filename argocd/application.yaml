@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elmira-site
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/robert456456456456/elmira-site.git
+    targetRevision: HEAD
+    path: helm/elmira-site
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: elmira
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
