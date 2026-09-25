@@ -55,3 +55,23 @@ jobs:
           git add helm/elmira-site/values.yaml helm/elmira-site/Chart.yaml
           git commit -m "chore: release $TAG [skip ci]" || exit 0
           git push origin main
+  verify:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Chart tag matches image
+        run: |
+          TAG=$(grep -E '^\s+tag:' helm/elmira-site/values.yaml | head -n1 | awk '{print $2}')
+          APP=$(grep -E '^appVersion:' helm/elmira-site/Chart.yaml | awk -F'"' '{print $2}')
+          echo "values.tag=$TAG appVersion=$APP"
+          [ -n "$TAG" ] && [ "$TAG" = "$APP" ] || exit 1
+      - name: Apex returns 200
+        run: |
+          for i in 1 2 3 4 5 6; do
+            CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 https://elmira-bakery.com/) && [ "$CODE" = "200" ] && exit 0
+            echo "try $i -> $CODE"; sleep 20
+          done
+          exit 1
