@@ -30,3 +30,26 @@ spec:
               port: 8080
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+        {{- if .Values.tunnel.enabled }}
+        - name: cloudflared
+          image: cloudflare/cloudflared:2024.10.0
+          args:
+            - tunnel
+            - --no-autoupdate
+            - run
+            - --token
+            - $(CF_TUNNEL_TOKEN)
+          env:
+            - name: CF_TUNNEL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: elmira-tunnel-token
+                  key: token
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+        {{- end }}
