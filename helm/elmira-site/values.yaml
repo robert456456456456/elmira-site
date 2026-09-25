@@ -4,7 +4,7 @@ tunnel:
   token: ""
 image:
   repository: us-central1-docker.pkg.dev/solid-heaven-334106/elmira/elmira-site
-  tag: v0.3.1
+  tag: v0.3.2
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP
