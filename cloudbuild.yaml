@@ -1,0 +1,13 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --platform=linux/amd64
+      - -t
+      - us-central1-docker.pkg.dev/solid-heaven-334106/elmira/elmira-site:$_TAG
+      - -t
+      - us-central1-docker.pkg.dev/solid-heaven-334106/elmira/elmira-site:latest
+      - .
+images:
+  - us-central1-docker.pkg.dev/solid-heaven-334106/elmira/elmira-site:$_TAG
+  - us-central1-docker.pkg.dev/solid-heaven-334106/elmira/elmira-site:latest
