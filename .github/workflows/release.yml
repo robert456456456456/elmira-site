@@ -14,9 +14,6 @@ env:
   REGION: us-central1
   AR_REPO: elmira
   IMAGE: elmira-site
-  CLUSTER: gke-free
-  CLUSTER_ZONE: us-central1-a
-  NAMESPACE: elmira
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -58,16 +55,3 @@ jobs:
           git add helm/elmira-site/values.yaml helm/elmira-site/Chart.yaml
           git commit -m "chore: release $TAG [skip ci]" || exit 0
           git push origin main
-      - name: Get GKE credentials
-        uses: google-github-actions/get-gke-credentials@v2
-        with:
-          cluster_name: ${{ env.CLUSTER }}
-          location: ${{ env.CLUSTER_ZONE }}
-      - name: Helm upgrade
-        uses: azure/setup-helm@v4
-      - run: |
-          kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
-          helm upgrade --install elmira helm/elmira-site \
-            --namespace ${{ env.NAMESPACE }} \
-            --set image.tag=${{ steps.tag.outputs.new_tag }} \
-            --wait --timeout 3m
