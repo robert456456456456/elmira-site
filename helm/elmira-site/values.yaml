@@ -1,6 +1,6 @@
 replicaCount: 2
 tunnel:
-  enabled: true
+  enabled: false
   token: ""
 image:
   repository: us-central1-docker.pkg.dev/solid-heaven-334106/elmira/elmira-site
