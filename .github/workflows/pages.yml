@@ -18,46 +18,8 @@ jobs:
 
       - name: Strip Wix banner from HTML
         run: |
-          python3 <<'PYEOF'
-          import os
-          import re
-
-          ads_css = '''<style>
-          /* Auto-injected by CI - Hide Wix banner */
-          #WIX_ADS { display: none !important; }
-          #flash-container { display: none !important; }
-          #promo-bar { display: none !important; }
-          </style>'''
-
-          def strip_banner(file_path):
-              with open(file_path, 'r', encoding='utf-8') as f:
-                  content = f.read()
-
-              if '<style>' in content and '</style>' in content:
-                  return  # Already has style block
-
-              # Inject CSS before closing head tag
-              # Look for </head> and insert before it
-              pattern = r'(</head>)'
-              if re.search(pattern, content, re.IGNORECASE):
-                  new_content = re.sub(pattern, ads_css + '\n\\1', content)
-                  with open(file_path, 'w', encoding='utf-8') as f:
-                      f.write(new_content)
-                  return True
-              else:
-                  return False
-
-          for root, dirs, files in os.walk('site'):
-              if 'site' in root:
-                  dirs[:] = [d for d in dirs if d != 'site']  # Skip site subdir
-              for fname in files:
-                  if fname.endswith('.html'):
-                      file_path = os.path.join(root, fname)
-                      if strip_banner(file_path):
-                          print(f"Stripped banner from {file_path}")
-
-          print("Banner stripping complete")
-          PYEOF
+          find site -name "*.html" -exec sed -i 's|</head>|<style>#WIX_ADS { display: none !important; }</style></head>|g' {} +
+          echo "Banner stripping complete"
 
       - uses: actions/upload-pages-artifact@v3
         with:
